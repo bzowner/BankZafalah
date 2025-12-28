@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bank Zafalah</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script>
+        function showTab(tab) {
+            document.getElementById('login-form').style.display = tab === 'login' ? 'block' : 'none';
+            document.getElementById('signup-form').style.display = tab === 'signup' ? 'block' : 'none';
+            document.getElementById('btn-login').classList.toggle('active', tab === 'login');
+            document.getElementById('btn-signup').classList.toggle('active', tab === 'signup');
+        }
+    </script>
+</head>
+<body>
+    <div class="hero-container">
+        <div class="logo">Bank <span>Zafalah</span></div>
+        <p>The Future of Banking in Pakistan.</p>
+
+        <div class="auth-box">
+            <div class="tabs">
+                <button id="btn-login" class="active" onclick="showTab('login')">Login</button>
+                <button id="btn-signup" onclick="showTab('signup')">Sign Up</button>
+            </div>
+
+            {% with messages = get_flashed_messages() %}
+              {% if messages %} <p class="error">{{ messages[0] }}</p> {% endif %}
+            {% endwith %}
+
+            <form id="login-form" action="/login" method="POST">
+                <input type="text" name="username" placeholder="Username" required>
+                <input type="password" name="password" placeholder="Password" required>
+                <button type="submit" class="btn-primary">Access Account</button>
+            </form>
+
+            <form id="signup-form" action="/signup" method="POST" style="display: none;">
+                <input type="text" name="username" placeholder="Pick a Username" required>
+                <input type="password" name="password" placeholder="Create Password" required>
+                
+                <div class="captcha-row">
+                    <img src="{{ url_for('captcha_image') }}" alt="Captcha">
+                    <input type="text" name="captcha" placeholder="Code" required>
+                </div>
+                
+                <button type="submit" class="btn-primary">Create Account</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

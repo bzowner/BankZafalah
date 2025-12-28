@@ -1,0 +1,40 @@
+:root { --primary: #00563B; --secondary: #D4AF37; --bg: #F4F7F6; --white: #fff; }
+body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; color: #333; }
+input, select { width: 100%; padding: 10px; margin: 5px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+
+/* Home/Auth */
+.hero-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background: var(--primary); color: white; }
+.logo { font-size: 2rem; font-weight: bold; margin-bottom: 10px; }
+.logo span { color: var(--secondary); }
+.auth-box { background: white; padding: 20px; border-radius: 8px; width: 350px; color: #333; }
+.tabs { display: flex; margin-bottom: 20px; border-bottom: 1px solid #eee; }
+.tabs button { flex: 1; padding: 10px; border: none; background: none; cursor: pointer; font-weight: bold; color: #777; }
+.tabs button.active { border-bottom: 3px solid var(--primary); color: var(--primary); }
+
+/* Dashboard */
+header { background: var(--white); padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+.badge { background: #eee; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; margin-right: 10px; }
+.badge.ceo { background: red; color: white; }
+.main-content { max-width: 1000px; margin: 30px auto; padding: 0 20px; }
+.card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 20px; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+
+/* Elements */
+.balance-amount { font-size: 2rem; font-weight: bold; color: var(--primary); }
+.btn-primary, .btn-action { background: var(--primary); color: white; border: none; padding: 10px; width: 100%; cursor: pointer; border-radius: 4px; }
+.btn-action:hover { background: #00452f; }
+.btn-small { padding: 5px 10px; border: none; border-radius: 3px; cursor: pointer; color: white; font-size: 0.8rem; margin: 2px; }
+.green { background: green; } .red { background: red; }
+table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+th, td { padding: 10px; text-align: left; border-bottom: 1px solid #eee; font-size: 0.9rem; }
+.alert { background: #e8f5e9; padding: 10px; border-left: 5px solid green; margin-bottom: 20px; }
+.error { color: red; text-align: center; }
+
+/* CEO Section */
+.ceo-panel { border-top: 4px solid red; margin-top: 40px; padding-top: 20px; }
+.ceo-panel h2 { color: red; text-align: center; margin-bottom: 30px; }
+
+/* Utilities */
+.captcha-row { display: flex; gap: 10px; align-items: center; }
+.captcha-row img { height: 40px; }

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script>
+        function convertCurrency() {
+            let pkr = document.getElementById('pkr-input').value;
+            // Rough estimates
+            let usd = (pkr / 278).toFixed(2);
+            let eur = (pkr / 305).toFixed(2);
+            let gbp = (pkr / 355).toFixed(2);
+            document.getElementById('conversion-result').innerHTML = 
+                `$${usd} USD <br> €${eur} EUR <br> £${gbp} GBP`;
+        }
+    </script>
+</head>
+<body>
+
+<header>
+    <div class="logo">Bank <span>Zafalah</span></div>
+    <div class="user-info">
+        {% if user.role == 'employee' %} <span class="badge">Staff: {{ user.job_title }}</span> {% endif %}
+        {% if user.role == 'ceo' %} <span class="badge ceo">CEO</span> {% endif %}
+        <span>{{ user.username }}</span>
+        <a href="/logout" class="btn-logout">Logout</a>
+    </div>
+</header>
+
+<div class="main-content">
+    
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="alert">{{ messages[0] }}</div>
+      {% endif %}
+    {% endwith %}
+
+    <div class="grid-2">
+        <div class="card balance-card">
+            <h3>Available Balance</h3>
+            <div class="amount">Rs. {{ "%.2f"|format(user.balance) }}</div>
+            <p>{{ user.account_no }}</p>
+        </div>
+        
+        <div class="card">
+            <h3>Currency Converter</h3>
+            <input type="number" id="pkr-input" placeholder="Enter PKR Amount" oninput="convertCurrency()">
+            <div id="conversion-result" style="margin-top: 10px; font-weight: bold; color: #555;">
+                Enter amount to convert
+            </div>
+        </div>
+    </div>
+
+    <div class="grid-3">
+        <div class="card">
+            <h3>Transfer Money</h3>
+            <form action="/transfer" method="POST">
+                <input type="text" name="recipient" placeholder="Recipient Username" required>
+                <input type="number" name="amount" placeholder="Amount (PKR)" required>
+                <button class="btn-action">Send</button>
+            </form>
+        </div>
+
+        <div class="card">
+            <h3>Cash Services</h3>
+            <form action="/submit_request" method="POST">
+                <select name="type">
+                    <option value="Deposit">Deposit Request</option>
+                    <option value="Withdraw">Withdraw Request</option>
+                </select>
+                <input type="number" name="amount" placeholder="Amount (PKR)" required>
+                <button class="btn-action">Submit</button>
+            </form>
+        </div>
+
+        <div class="card">
+            <h3>Interest-Free Loan</h3>
+            <form action="/submit_request" method="POST">
+                <input type="hidden" name="type" value="Loan">
+                <input type="number" name="amount" placeholder="Loan Amount (PKR)" required>
+                <input type="text" name="details" placeholder="Reason (e.g. Home, Car)" required>
+                <button class="btn-action">Apply for Loan</button>
+            </form>
+        </div>
+    </div>
+
+    {% if user.role == 'user' and user.employment_status == 'none' %}
+    <div class="card" style="text-align: center; margin-top: 20px;">
+        <h3>Join Our Team</h3>
+        <p>Become a Bank Zafalah employee today.</p>
+        <form action="/submit_request" method="POST">
+            <input type="hidden" name="type" value="Job Application">
+            <button class="btn-primary">Apply for Job</button>
+        </form>
+    </div>
+    {% elif user.employment_status == 'pending' %}
+    <div class="card" style="text-align: center; margin-top: 20px; background: #fff3cd;">
+        <p><strong>Job Application Pending Review</strong></p>
+    </div>
+    {% endif %}
+
+    <div class="card" style="margin-top: 20px;">
+        <h3>History</h3>
+        <table>
+            <tr><th>Date</th><th>Description</th><th>Amount</th></tr>
+            {% for t in transactions %}
+            <tr>
+                <td>{{ t.date }}</td>
+                <td>{{ t.description }}</td>
+                <td style="color: {{ 'red' if t.type=='Debit' else 'green' }}">
+                    {{ '-' if t.type=='Debit' else '+' }}Rs. {{ t.amount }}
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    {% if user.role == 'ceo' %}
+    <div class="ceo-panel">
+        <h2>CEO CONTROL CENTER</h2>
+
+        <div class="card">
+            <h3>Pending Approvals ({{ ceo_data.pending_requests|length }})</h3>
+            <table>
+                <tr><th>User</th><th>Request</th><th>Details</th><th>Action</th></tr>
+                {% for r in ceo_data.pending_requests %}
+                <tr>
+                    <td>{{ r.username }}</td>
+                    <td>{{ r.type }} <br> <b>Rs. {{ r.amount }}</b></td>
+                    <td>{{ r.details }}</td>
+                    <td>
+                        <form action="/ceo_action" method="POST" style="display:inline;">
+                            <input type="hidden" name="req_id" value="{{ r.id }}">
+                            <input type="hidden" name="user_id" value="{{ r.user_id }}">
+                            
+                            {% if r.type == 'Job Application' %}
+                                <input type="text" name="job_title" placeholder="Job Title" required style="width: 100px;">
+                                <button name="action_type" value="approve_request" class="btn-small green">Hire</button>
+                            {% else %}
+                                <button name="action_type" value="approve_request" class="btn-small green">Approve</button>
+                            {% endif %}
+                            
+                            <button name="action_type" value="reject_request" class="btn-small red">Reject</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+        <div class="card">
+            <h3>Employee Management</h3>
+            <table>
+                <tr><th>Name</th><th>Title</th><th>Action</th></tr>
+                {% for emp in ceo_data.employees %}
+                <tr>
+                    <td>{{ emp.username }}</td>
+                    <td>{{ emp.job_title }}</td>
+                    <td>
+                        <form action="/ceo_action" method="POST">
+                            <input type="hidden" name="user_id" value="{{ emp.id }}">
+                            <button name="action_type" value="fire_employee" class="btn-small red">Fire Employee</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+        <div class="card">
+            <h3>All Accounts</h3>
+            <table>
+                <tr><th>User</th><th>Role</th><th>Balance</th><th>Action</th></tr>
+                {% for u in ceo_data.all_users %}
+                <tr>
+                    <td>{{ u.username }}</td>
+                    <td>{{ u.role }}</td>
+                    <td>Rs. {{ u.balance }}</td>
+                    <td>
+                        <form action="/ceo_action" method="POST" onsubmit="return confirm('Delete this user?');">
+                            <input type="hidden" name="user_id" value="{{ u.id }}">
+                            <button name="action_type" value="delete_user" class="btn-small red">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+
+</body>
+</html>

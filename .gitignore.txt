@@ -1,0 +1,4 @@
+__pycache__/
+bank.db
+venv/
+.DS_Store

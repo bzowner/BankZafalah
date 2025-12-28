@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sign Up | Bank Zafalah</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script>
+        function refreshCaptcha() {
+            // Adds a timestamp to force the browser to reload the image
+            document.getElementById('captcha-img').src = "/captcha_image?" + new Date().getTime();
+        }
+    </script>
+</head>
+<body style="background-color: var(--primary); display: flex; align-items: center; justify-content: center; height: 100vh;">
+
+    <div class="login-box" style="width: 100%; max-width: 400px;">
+        <h2 style="text-align: center;">Join Us</h2>
+        
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <p style="color: red; text-align: center;">{{ messages[0] }}</p>
+          {% endif %}
+        {% endwith %}
+
+        <form action="/signup" method="POST">
+            <label>Username</label>
+            <input type="text" name="username" required>
+            
+            <label>Password</label>
+            <input type="password" name="password" required>
+            
+            <div style="background: #fff; padding: 10px; margin: 15px 0; border: 1px solid #ccc; text-align: center;">
+                <img id="captcha-img" src="{{ url_for('captcha_image') }}" alt="Captcha" style="border-radius: 4px;">
+                <br>
+                <button type="button" onclick="refreshCaptcha()" style="background: none; border: none; color: blue; cursor: pointer; text-decoration: underline; font-size: 0.8rem;">Can't read? Refresh</button>
+                <input type="text" name="captcha" placeholder="Enter code from image" required style="margin-top: 10px; text-transform: uppercase;">
+            </div>
+
+            <button type="submit" class="btn" style="width: 100%;">Create Account</button>
+        </form>
+
+        <p style="text-align: center; margin-top: 20px;">
+            <a href="/" style="color: var(--accent); font-weight: bold;">Back to Login</a>
+        </p>
+    </div>
+
+</body>
+</html>
